@@ -83,7 +83,8 @@ function setup_highchartsmap(){
 	geo_json = JSON.parse(request.responseText);
   project(
       geo_json,
-      '+proj=merc +lat_1=33 +lat_2=45 +lat_0=0 +lon_0=0'
+      '+proj=merc +lat_1=33 +lat_2=45 +lat_0=0 +lon_0=0',
+      ''
   );
 
 	//DATA prep
@@ -354,13 +355,13 @@ function throttle(fn, interval) {
 }
 
 // Project the data using Proj4
-function project(geojson, projection) {
+function project(geojson, projection, filter) {
     const projectPolygon = coordinate => {
         coordinate.forEach((lonLat, i) => {
             coordinate[i] = window.proj4(projection, lonLat);
         });
     };
-    geojson.features.forEach(function (feature) {
+    geojson.features.filter(feature => { return feature.properties.AGS.startsWith(filter) }).forEach(function (feature) {
         if (feature.geometry.type === 'Polygon') {
             feature.geometry.coordinates.forEach(projectPolygon);
         } else if (feature.geometry.type === 'MultiPolygon') {
